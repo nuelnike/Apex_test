@@ -31,16 +31,16 @@ This repository demonstrates a QA test automation setup for a microservice respo
 ### Functional Test Description
 This Postman collection tests the `POST /send-email` API using a multi-cycle strategy (1 to 4 test cases). It dynamically switches input values and assertions per test cycle via scripts in the `Pre-request` and `Tests` tabs.
 
-### Performance Test Description
+## Performance Test Description
 This k6 script simulates load on the `/send-email` endpoint. It randomly selects one of 4 test variations per virtual user.
 
-### File Structure
+## File Structure
 1. Apex/
 2.  ┣ Apex Networks.postman_collection.json  # Functional tests
 3.  ┣ performancetest.js                     # k6 performance script
 4.  ┗ README.md                              # This file
 
-### Test Cycles Covered
+## Test Cycles Covered
 
 | Cycle | Test Description                                      | Expected Result           |
 |-------|--------------------------------------------------------|---------------------------|
@@ -49,7 +49,7 @@ This k6 script simulates load on the `/send-email` endpoint. It randomly selects
 | 3     | Simulated full queue scenario using UID                | ❌ Should fail             |
 | 4     | Valid request with proper recipient email              | ✅ Should succeed (200 OK) |
 
-### Environment Variables (Used Internally)
+## Environment Variables (Used Internally)
 
 | Variable   | Description                                     |
 |------------|-------------------------------------------------|
@@ -60,7 +60,7 @@ This k6 script simulates load on the `/send-email` endpoint. It randomly selects
 | `cycle`    | Current test cycle index                        |
 | `cycles`   | Total number of test cycles                     |
 
-### How It Works
+## How It Works
 - Each request updates `cycle`, `receiver`, and `testCase` variables.
 - The `Tests` script evaluates whether the response is valid or invalid based on the scenario.
 - The same request (`API test`) is recursively called until all test cycles complete.
@@ -71,12 +71,12 @@ This k6 script simulates load on the `/send-email` endpoint. It randomly selects
 - GO latest version
 - Postman (for API tests)
 
-### How To Run (POSTMAN)
+## How To Run (POSTMAN)
 - Install & Run Postman
 - Import Collection
 - Run collection
 
-### How To Run (K6)
+## How To Run (K6)
 - Go to: https://github.com/grafana/k6/releases
 - Download the .zip for Windows.
 - Extract it and move the k6.exe to a folder (e.g., C:\k6\).
@@ -86,7 +86,7 @@ This k6 script simulates load on the `/send-email` endpoint. It randomly selects
 - On CLI Run: k6 run performancetest.js
 - On CLI Run: k6 run performancetest.js --out json=results.json #save test result.
 
-### Assumptions
+## Assumptions
 The `/send-email` endpoint accepts a POST request with the following JSON body:
 
 ```json
@@ -97,13 +97,13 @@ The `/send-email` endpoint accepts a POST request with the following JSON body:
 }
 ```
 
-### Notes
+## Notes
 - The collection uses pm.collectionVariables to persist values across cycles.
 - All test logic is embedded in the Postman file—no extra setup is required.
 - k6 output provides rich metrics: HTTP duration, error rates, throughput, etc.
 - Be sure to check the Pre-request and Tests tabs in Postman to see the test logic.
 
-### Author
+## Author
 - Prepared by: Emmanuel Ikenna Agba-Ogbonna
 - Test Type: Functional, Negative/Positive, Load Test
 - Tooling: Postman, k6.
