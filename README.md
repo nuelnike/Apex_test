@@ -68,7 +68,7 @@ This k6 script simulates load on the `/send-email` endpoint. It randomly selects
 
 ## Prerequisites
 - Node.js v16+
-- GO v10+
+- GO latest version
 - Postman (for API tests)
 
 ### How To Run (POSTMAN)
