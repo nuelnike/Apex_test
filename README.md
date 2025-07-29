@@ -35,10 +35,10 @@ This Postman collection tests the `POST /send-email` API using a multi-cycle str
 This k6 script simulates load on the `/send-email` endpoint. It randomly selects one of 4 test variations per virtual user.
 
 ### File Structure
-Apex/
- ┣ Apex Networks.postman_collection.json   # Functional tests
- ┣ performancetest.js                     # k6 performance script
- ┗ README.md                              # This file
+1. Apex/
+2.  ┣ Apex Networks.postman_collection.json  # Functional tests
+3.  ┣ performancetest.js                     # k6 performance script
+4.  ┗ README.md                              # This file
 
 ### Test Cycles Covered
 
