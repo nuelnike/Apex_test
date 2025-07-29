@@ -1,0 +1,212 @@
+{
+	"info": {
+		"_postman_id": "724004bb-01b6-463b-b5d6-8b167f0d5491",
+		"name": "Apex Networks",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8914259"
+	},
+	"item": [
+		{
+			"name": "API test",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"/**\r",
+							" * @description\r",
+							" * This pre-request script dynamically sets up test conditions for each execution cycle\r",
+							" * in a Postman collection run. It uses a `cycle` variable to control different scenarios.\r",
+							" * Each cycle corresponds to a specific test case for an email-sending microservice.\r",
+							" *\r",
+							" * Variables:\r",
+							" * - cycle (number): Determines which test case to run (default = 1 if not provided).\r",
+							" * - testCase (string): Descriptive label of the test case for reporting/logging.\r",
+							" *\r",
+							" * Collection Variables Set:\r",
+							" * - receiver (string): Email address used for the test. Empty or invalid in negative tests.\r",
+							" * - testCase (string): Human-readable name of the current test case.\r",
+							" * - uid (number): Identifier used to simulate queue behavior (Cycle 3).\r",
+							" * - cycles (number): Total number of cycles defined (set only in final cycle).\r",
+							" *\r",
+							" * Test Cycles:\r",
+							" * 1. Negative Test - Empty receiver field (missing recipient address).\r",
+							" * 2. Negative Test - Invalid email format.\r",
+							" * 3. Negative Test - Simulate full queue behavior using a static uid.\r",
+							" * 4. Positive Test - Valid email address to validate successful delivery.\r",
+							" */\r",
+							"\r",
+							"// Retrieve the current test case description (if previously set)\r",
+							"let testCase = pm.variables.get(\"testCase\");\r",
+							"\r",
+							"// Retrieve the current cycle number from variables; default to 1 if not set\r",
+							"let cycle = pm.variables.get(\"cycle\") || 1;\r",
+							"\r",
+							"// Test Case Definitions\r",
+							"// Cycle 1: Test sending an email without a recipient (empty receiver)\r",
+							"if (cycle == 1) {\r",
+							"    pm.collectionVariables.set(\"cycles\", 4); // Define total number of test cycles\r",
+							"    pm.collectionVariables.set(\"receiver\", \"\"); // Set empty string as receiver to simulate missing email\r",
+							"    pm.collectionVariables.set(\"testCase\", \"Negative Test - Send mail with empty receiver\"); // Set description for reporting\r",
+							"}\r",
+							"\r",
+							"// Cycle 2: Test sending an email with an invalid email address format\r",
+							"if (cycle == 2) {\r",
+							"    pm.collectionVariables.set(\"receiver\", \"sampleyopmail.com\"); // Missing '@' symbol to simulate invalid email\r",
+							"    pm.collectionVariables.set(\"testCase\", \"Negative Test - Send mail with invalid receiver's email address\"); // Description for logs\r",
+							"}\r",
+							"\r",
+							"// Cycle 3: Test the system's behavior when the email queue is full\r",
+							"if (cycle == 3) {\r",
+							"    pm.collectionVariables.set(\"testCase\", \"Negative Test - Full Queue Test.\"); // No receiver needed for this logic\r",
+							"}\r",
+							"\r",
+							"// Cycle 4: Test sending an email with valid data to verify successful delivery\r",
+							"if (cycle == 4) {\r",
+							"    pm.collectionVariables.set(\"receiver\", \"valid@example.com\"); // A valid receiver email\r",
+							"    pm.collectionVariables.set(\"testCase\", \"Positive Test - Send a valid email.\"); // Descriptive label for the test\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/**\r",
+							" * @description\r",
+							" * This script is executed in the \"Tests\" tab of a Postman request.\r",
+							" * It manages multiple test cycles using the `cycle` and `cycles` variables to\r",
+							" * iterate through predefined test scenarios (e.g., positive and negative email tests).\r",
+							" * NOTE: There is no live / mock server for this test, I assumed the behaviour based on the API spec provided on the test requirement document.\r",
+							" *\r",
+							" * Workflow:\r",
+							" * - Retrieves the current cycle and total cycles.\r",
+							" * - Executes assertions based on the current test case description.\r",
+							" * - If the current cycle is less than the total, it expects the response to fail (negative test).\r",
+							" * - If the final cycle is reached, it expects a successful response (positive test).\r",
+							" * - After each cycle, it either increments the cycle counter or resets it to 1.\r",
+							" * - Uses `pm.execution.setNextRequest(\"API test\")` to loop the same request.\r",
+							" *\r",
+							" * Variables used:\r",
+							" * - cycle (number): Current iteration of test.\r",
+							" * - cycles (number): Total number of test cycles to run.\r",
+							" * - testCase (string): Description of the current test case.\r",
+							" *\r",
+							" * Postman APIs used:\r",
+							" * - pm.test: For writing assertions.\r",
+							" * - pm.response: To access response status for validation.\r",
+							" * - pm.collectionVariables: For managing test state across requests.\r",
+							" * - pm.execution.setNextRequest: To rerun the same request in a loop.\r",
+							" */\r",
+							"\r",
+							"let cycle = pm.variables.get(\"cycle\") || 1;        // Get the current cycle number or default to 1\r",
+							"let cycles = pm.variables.get(\"cycles\");           // Get the total number of cycles\r",
+							"let test_case = pm.variables.get(\"testCase\");      // Get the current test case description\r",
+							"\r",
+							"if (cycle < Number(cycles)) {\r",
+							"    // For cycles before the last one, assert that the request fails (negative test)\r",
+							"    pm.test(test_case, () => pm.response.to.not.have.status(200));\r",
+							"\r",
+							"    // Move to the next cycle by incrementing the cycle counter\r",
+							"    pm.collectionVariables.set(\"cycle\", Number(cycle) + 1);\r",
+							"\r",
+							"    // Re-execute the same request to test the next scenario\r",
+							"    pm.execution.setNextRequest(\"API test\");\r",
+							"} else {\r",
+							"    // On the last cycle, assert that the request succeeds (positive test)\r",
+							"    pm.test(test_case, () => pm.response.to.have.status(200));\r",
+							"\r",
+							"    // Reset the cycle counter to start again if needed\r",
+							"    pm.collectionVariables.set(\"cycle\", 1);\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"to\": \"{{receiver}}\", \r\n    \"subject\": \"{{subject}}\", \r\n    \"body\": \"{{body}}\"\r\n}"
+				},
+				"url": {
+					"raw": "http://mock.api/send-email",
+					"protocol": "http",
+					"host": [
+						"mock",
+						"api"
+					],
+					"path": [
+						"send-email"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "receiver",
+			"value": "sample@yopmail.com",
+			"type": "default"
+		},
+		{
+			"key": "subject",
+			"value": "",
+			"type": "default"
+		},
+		{
+			"key": "body",
+			"value": "this is a sample email.",
+			"type": "default"
+		},
+		{
+			"key": "testCase",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cycle",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "cycles",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
