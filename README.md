@@ -1,5 +1,19 @@
 # Apex Networks QA Automation Test
 
+## Table of Contents
+- [Overview](#overview)
+- [Functional API Automation with Postman](#functional-api-automation-with-postman)
+- [Test Structure](#test-structure)
+- [Test Cycles Covered](#test-cycles-covered)
+- [Environment Variables](#environment-variables)
+- [How It Works](#how-it-works)
+- [Prerequisites](#prerequisites)
+- [How To Run (POSTMAN)](#how-to-run-postman)
+- [How To Run (K6)](#how-to-run-k6)
+- [Assumptions](#assumptions)
+- [Notes](#notes)
+- [Author](#author)
+
 ## Overview
 
 This repository demonstrates a QA test automation setup for a microservice responsible for **sending emails** via HTTP. It includes:
@@ -14,10 +28,10 @@ This repository demonstrates a QA test automation setup for a microservice respo
 ### Postman File:   `Apex Networks.postman_collection.json`
 ### K6 File:        `performancetest.js`
 
-### Description Functional Test
+### Functional Test Description
 This Postman collection tests the `POST /send-email` API using a multi-cycle strategy (1 to 4 test cases). It dynamically switches input values and assertions per test cycle via scripts in the `Pre-request` and `Tests` tabs.
 
-### Description Performance Test
+### Performance Test Description
 This k6 script simulates load on the `/send-email` endpoint. It randomly selects one of 4 test variations per virtual user.
 
 ### File Structure
@@ -92,4 +106,4 @@ The `/send-email` endpoint accepts a POST request with the following JSON body:
 ### Author
 - Prepared by: Emmanuel Ikenna Agba-Ogbonna
 - Test Type: Functional, Negative/Positive, Load Test
-- Tooling: Postman (Newman), k6.
+- Tooling: Postman, k6.
